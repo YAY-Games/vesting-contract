@@ -1,0 +1,32 @@
+{
+  "name": "vesting-contract",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "coverage": "npx hardhat coverage",
+    "lint": "npx solhint contracts/*.sol"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YAY-Games/vesting-contract.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YAY-Games/vesting-contract/issues"
+  },
+  "homepage": "https://github.com/YAY-Games/vesting-contract#readme",
+  "devDependencies": {
+    "@openzeppelin/contracts": "^3.3.0",
+    "@nomiclabs/hardhat-truffle5": "^2.0.0",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "dotenv": "^10.0.0",
+    "hardhat": "^2.6.0",
+    "solhint": "^3.3.6",
+    "web3": "^1.5.1"
+  }
+}
