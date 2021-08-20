@@ -41,6 +41,7 @@ contract YayVesting is Ownable {
     mapping(address => bool) public tgeIsClaimed;
     mapping(address => uint256) public lastClaimedStep;
     
+    // solhint-disable not-rely-on-time
     constructor(address _token, uint256 _tgeTimestamp) public {
         require(_token != address(0));
         require(_tgeTimestamp >= block.timestamp);
@@ -76,7 +77,7 @@ contract YayVesting is Ownable {
     }
 
     function init(InvestorTokens[] calldata values) external onlyOwner returns(bool) {
-        require(!inited, "YayVesting: ");
+        require(!inited, "YayVesting: already initiated");
 
         for (uint256 i = 0; i < values.length; i++) {
             require(investorBalance[values[i].investor] == 0);
