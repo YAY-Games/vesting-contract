@@ -5,7 +5,7 @@ async function main() {
     process.env["TOKEN_CONTRACT"],
     process.env["TGE_TIMESTAMP"],
   );
-  YayVesting.setAsDeployed(yayVesting);
+  await YayVesting.setAsDeployed(yayVesting);
 
   console.log("contract deployed: ", yayVesting.address);
 }
