@@ -119,11 +119,13 @@ contract YayVesting is Ownable {
         uint256 tgeTime = tgeTimestamp;
         for (uint256 i = lastClaimedStep[msg.sender]; i < category.totalSteps; i++) {
 
-            if (tgeTime.add(category.stepTime.mul(i)) >= block.timestamp) {
+            if (tgeTime.add(category.stepTime.mul(i.add(1))) <= block.timestamp) {
                 lastClaimedStep[msg.sender] = i.add(1);
                 reward = reward.add(_amount.mul(category.percentAfter).div(100_00));
 
                 emit StepClaim(msg.sender, i.add(1), block.timestamp);
+            } else {
+                break;
             }
         }
 
