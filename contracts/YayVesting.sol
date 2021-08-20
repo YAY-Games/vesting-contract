@@ -3,15 +3,15 @@
 pragma solidity ^0.6.12;
 pragma experimental ABIEncoderV2;
 
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-
 
 contract YayVesting is Ownable {
     using SafeMath for uint256;
 
-    // Category
+    // category
     enum CategoryNames {EMPTY, SEED, STRATEGIC, PRESALE, PUBLIC}
     struct CategoryType {
         uint256 totalSteps;
@@ -21,32 +21,42 @@ contract YayVesting is Ownable {
     }
     mapping(CategoryNames => CategoryType) public categories;
 
-    // Investor
+    // investor
     struct InvestorTokens {
         address investor;
         CategoryNames category; 
         uint256 tokenAmount;
     }
-    uint256 public totalInvestors;
-    mapping(address => uint256) public investorBalance;
-    mapping(address => uint256) public rewardedToInvestor;
-    mapping(address => CategoryNames) public investorCategory;
+    mapping(address => uint256) public alreadyRewarded;
 
-    // Contract settings
+    // contract settings
     address public immutable token;
+    bytes32 public immutable mercleRoot;
     uint256 public immutable tgeTimestamp;
-    bool public inited = false;
 
-    // Claim state
+    // claim state
     mapping(address => bool) public tgeIsClaimed;
     mapping(address => uint256) public lastClaimedStep;
+
+    event Claim(
+        address indexed target,
+        uint256 indexed category,
+        uint256 amount,
+        bytes32[] merkleProof,
+        uint256 resultReward,
+        uint256 timestamp
+    );
+    event TgeClaim(address indexed target, uint256 timestamp);
+    event StepClaim(address indexed target, uint256 indexed step, uint256 timestamp);
     
     // solhint-disable not-rely-on-time
-    constructor(address _token, uint256 _tgeTimestamp) public {
-        require(_token != address(0));
-        require(_tgeTimestamp >= block.timestamp);
+    constructor(address _token, bytes32 _mercleRoot, uint256 _tgeTimestamp) public {
+        require(_token != address(0), "YayVesting: zero token address");
+        require(_mercleRoot != bytes32(0), "YayVesting: zero mercle root");
+        require(_tgeTimestamp >= block.timestamp, "YayVesting: wrong TGE timestamp");
 
         token = _token;
+        mercleRoot = _mercleRoot;
         tgeTimestamp = _tgeTimestamp;
 
         // rounds settings
@@ -76,73 +86,69 @@ contract YayVesting is Ownable {
         });
     }
 
-    function init(InvestorTokens[] calldata values) external onlyOwner returns(bool) {
-        require(!inited, "YayVesting: already initiated");
-
-        for (uint256 i = 0; i < values.length; i++) {
-            require(investorBalance[values[i].investor] == 0);
-            require(values[i].category != CategoryNames.EMPTY);
-            require(values[i].tokenAmount != 0);
-
-            investorBalance[values[i].investor] = values[i].tokenAmount;
-            investorCategory[values[i].investor] = values[i].category;
-            totalInvestors = totalInvestors.add(1);
-        }
-        return true;
-    }
-
-    function closeInit() external onlyOwner returns(bool) {
-        require(!inited, "YayVesting: already initiated");
-        inited = true;
-        return true;
-    }
-
     function emergencyWithdrawal(uint256 amount) external onlyOwner returns(bool) {
         require(amount > 0, "YayVesting: amount must be greater than 0");
         IERC20(token).transfer(msg.sender, amount);
         return true;
     }
 
-    function claim() external returns(uint256 totalReward) {
-        require(inited, "YayVesting: claimable not allowed yet");
-        require(investorBalance[msg.sender] > 0, "YayVesting: you are not investor");
+    function checkClaim(address _target, uint256 _category, uint256 _amount, bytes32[] calldata _merkleProof) external view returns(bool) {
+        return (verify(_target, _category, _amount, _merkleProof));
+    }
 
-        CategoryType memory category = categories[investorCategory[msg.sender]];
+    function claim(uint256 _category, uint256 _amount, bytes32[] calldata _merkleProof) external returns(uint256 _claimResult) {
+        require(verify(msg.sender, _category, _amount, _merkleProof), "YayVesting: Invalid proof or wrong data");
+        require(CategoryNames(_category) != CategoryNames.EMPTY, "YayVesting: Invalid category");
+        require(_amount > 0, "YayVesting: Invalid amount");
+
+        CategoryType memory category = categories[CategoryNames(_category)];
 
         require(block.timestamp >= tgeTimestamp, "YayVesting: TGE has not started yet");
 
         uint256 reward = 0;
-        uint256 balance = investorBalance[msg.sender];
 
+        // claim TGE reward
         if (tgeIsClaimed[msg.sender] == false) {
-            reward = reward.add(balance.mul(category.percentBefore).div(100_00));
+            reward = reward.add(_amount.mul(category.percentBefore).div(100_00));
             tgeIsClaimed[msg.sender] = true;
+
+            emit TgeClaim(msg.sender, block.timestamp);
         }
 
+        // claim reward after TGE
         uint256 tgeTime = tgeTimestamp;
         for (uint256 i = lastClaimedStep[msg.sender]; i < category.totalSteps; i++) {
 
             if (tgeTime.add(category.stepTime.mul(i)) >= block.timestamp) {
                 lastClaimedStep[msg.sender] = i.add(1);
-                reward = reward.add(balance.mul(category.percentAfter).div(100_00));
+                reward = reward.add(_amount.mul(category.percentAfter).div(100_00));
+
+                emit StepClaim(msg.sender, i.add(1), block.timestamp);
             }
         }
 
         require(reward > 0, "YayVesting: no tokens to claim");
 
-        uint256 rewarded = rewardedToInvestor[msg.sender];
-        uint256 needToReward = 0;
+        uint256 rewarded = alreadyRewarded[msg.sender];
+        uint256 resultReward = 0;
 
-        // if overlimit (security check)
-        if (rewarded.add(reward) > balance) {
-            needToReward = balance.sub(rewarded);
+        // if reward overlimit (security check)
+        if (rewarded.add(reward) > _amount) {
+            resultReward = _amount.sub(rewarded);
         } else {
-            needToReward = reward;
+            resultReward = reward;
         }
 
-        rewardedToInvestor[msg.sender] = rewardedToInvestor[msg.sender].add(needToReward);
-        IERC20(token).transfer(msg.sender, needToReward);
+        alreadyRewarded[msg.sender] = alreadyRewarded[msg.sender].add(resultReward);
+        IERC20(token).transfer(msg.sender, resultReward);
 
-        return(needToReward);
+        emit Claim(msg.sender, _category, _amount, _merkleProof, resultReward, block.timestamp);
+
+        return(resultReward);
+    }
+
+    function verify(address _target, uint256 _category, uint256 _amount, bytes32[] memory _merkleProof) internal view returns(bool) {
+        bytes32 node = keccak256(abi.encodePacked(_target, _category, _amount));
+        return(MerkleProof.verify(_merkleProof, mercleRoot, node));
     }
 }

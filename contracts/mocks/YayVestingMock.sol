@@ -8,12 +8,13 @@ import "../YayVesting.sol";
 contract YayVestingMock is YayVesting {
     constructor(
         address _token,
+        bytes32 _mercleRoot,
         uint256 _tgeTimestamp,
         uint256 stepTimeSeed,
         uint256 stepTimeStrategic,
         uint256 stepTimePresale,
         uint256 stepTimePublic
-    ) YayVesting(_token, _tgeTimestamp) public {
+    ) YayVesting(_token, _mercleRoot, _tgeTimestamp) public {
         categories[CategoryNames.SEED] = CategoryType({
             totalSteps: 15,
             stepTime: stepTimeSeed,
