@@ -21,10 +21,10 @@ module.exports = {
   networks: {
     hardhat: {
     },
-    production: {
-      url: getEnv('RPC_URL'),
-      accounts: [getEnv('PRIVATE_KEY')]
-    }
+    // production: {
+    //   url: getEnv('RPC_URL'),
+    //   accounts: [getEnv('PRIVATE_KEY')]
+    // }
   },
   solidity: {
     version: "0.6.12",
