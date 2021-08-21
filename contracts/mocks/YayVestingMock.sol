@@ -10,34 +10,35 @@ contract YayVestingMock is YayVesting {
         address _token,
         bytes32 _mercleRoot,
         uint256 _tgeTimestamp,
-        uint256 stepTimeSeed,
-        uint256 stepTimeStrategic,
-        uint256 stepTimePresale,
-        uint256 stepTimePublic
+        uint256 stepsTimeSeed,
+        uint256 stepsTimeStrategic,
+        uint256 stepsTimePresale,
+        uint256 stepsTimePublic
     ) YayVesting(_token, _mercleRoot, _tgeTimestamp) public {
+        // rounds settings
         categories[CategoryNames.SEED] = CategoryType({
-            totalSteps: 15,
-            stepTime: stepTimeSeed,
+            totalSteps: stepsTimeSeed,
+            stepTime: 30 days,
             percentBefore: 10_00,
-            percentAfter: 6_00
+            percentAfter: 6_00  // 6.00% * 15 + 10.00% = 100.00%
         });
         categories[CategoryNames.STRATEGIC] = CategoryType({
-            totalSteps: 12,
-            stepTime: stepTimeStrategic,
+            totalSteps: stepsTimeStrategic,
+            stepTime: 30 days,
             percentBefore: 10_00,
-            percentAfter: 7_50
+            percentAfter: 7_50  // 7.50% * 12 + 10.00% = 100.00%
         });
         categories[CategoryNames.PRESALE] = CategoryType({
-            totalSteps: 5,
-            stepTime: stepTimePresale,
+            totalSteps: stepsTimePresale,
+            stepTime: 30 days,
             percentBefore: 30_00,
-            percentAfter: 14_00
+            percentAfter: 14_00  // 14.00% * 5 + 30.00% = 100.00%
         });
         categories[CategoryNames.PUBLIC] = CategoryType({
-            totalSteps: 8,
-            stepTime: stepTimePublic,
+            totalSteps: stepsTimePublic,
+            stepTime: 7 days,
             percentBefore: 30_00,
-            percentAfter: 8_75
+            percentAfter: 8_75  // 8.75% * 8 + 30.00% = 100.00%
         });
     }
 }
