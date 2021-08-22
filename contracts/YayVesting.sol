@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.12;
+pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -46,8 +46,8 @@ contract YayVesting is Ownable {
         uint256 resultReward,
         uint256 timestamp
     );
-    event TgeClaim(address indexed target, uint256 timestamp);
-    event StepClaim(address indexed target, uint256 indexed step, uint256 timestamp);
+    event TgeClaim(address indexed target, uint256 value, uint256 timestamp);
+    event StepClaim(address indexed target, uint256 indexed step, uint256 value, uint256 timestamp);
     
     // solhint-disable not-rely-on-time
     constructor(address _token, bytes32 _mercleRoot, uint256 _tgeTimestamp) public {
@@ -93,17 +93,16 @@ contract YayVesting is Ownable {
     }
 
     function checkClaim(address _target, uint256 _category, uint256 _amount, bytes32[] calldata _merkleProof) external view returns(bool) {
-        return (verify(_target, _category, _amount, _merkleProof));
+        return (_verify(_target, _category, _amount, _merkleProof));
     }
 
     function claim(uint256 _category, uint256 _amount, bytes32[] calldata _merkleProof) external returns(uint256 _claimResult) {
-        require(verify(msg.sender, _category, _amount, _merkleProof), "YayVesting: Invalid proof or wrong data");
+        require(_verify(msg.sender, _category, _amount, _merkleProof), "YayVesting: Invalid proof or wrong data");
         require(CategoryNames(_category) != CategoryNames.EMPTY, "YayVesting: Invalid category");
         require(_amount > 0, "YayVesting: Invalid amount");
+        require(block.timestamp >= tgeTimestamp, "YayVesting: TGE has not started yet");
 
         CategoryType memory category = categories[CategoryNames(_category)];
-
-        require(block.timestamp >= tgeTimestamp, "YayVesting: TGE has not started yet");
 
         uint256 reward = 0;
 
@@ -112,18 +111,18 @@ contract YayVesting is Ownable {
             reward = reward.add(_amount.mul(category.percentBefore).div(100_00));
             tgeIsClaimed[msg.sender] = true;
 
-            emit TgeClaim(msg.sender, block.timestamp);
+            emit TgeClaim(msg.sender, reward, block.timestamp);
         }
 
         // claim reward after TGE
-        uint256 tgeTime = tgeTimestamp;
         for (uint256 i = lastClaimedStep[msg.sender] + 1; i <= category.totalSteps; i++) {
 
-            if (tgeTime.add(category.stepTime.mul(i)) <= block.timestamp) {
+            if (tgeTimestamp.add(category.stepTime.mul(i)) <= block.timestamp) {
                 lastClaimedStep[msg.sender] = i;
-                reward = reward.add(_amount.mul(category.percentAfter).div(100_00));
+                uint256 addedAmount = _amount.mul(category.percentAfter).div(100_00);
+                reward = reward.add(addedAmount);
 
-                emit StepClaim(msg.sender, i, block.timestamp);
+                emit StepClaim(msg.sender, i, addedAmount, block.timestamp);
             } else {
                 break;
             }
@@ -149,7 +148,7 @@ contract YayVesting is Ownable {
         return(resultReward);
     }
 
-    function verify(address _target, uint256 _category, uint256 _amount, bytes32[] memory _merkleProof) internal view returns(bool) {
+    function _verify(address _target, uint256 _category, uint256 _amount, bytes32[] memory _merkleProof) internal view returns(bool) {
         bytes32 node = keccak256(abi.encodePacked(_target, _category, _amount));
         return(MerkleProof.verify(_merkleProof, mercleRoot, node));
     }
