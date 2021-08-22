@@ -135,7 +135,7 @@ contract YayVesting is Ownable {
 
         // if reward overlimit (security check)
         if (rewarded.add(reward) > _amount) {
-            resultReward = _amount.sub(rewarded);
+            resultReward = _amount.sub(rewarded, "YayVesting: no tokens to claim (security check)");
         } else {
             resultReward = reward;
         }
