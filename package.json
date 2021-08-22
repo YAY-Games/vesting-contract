@@ -30,6 +30,7 @@
     "keccak256": "^1.0.3",
     "merkletreejs": "^0.2.24",
     "solhint": "^3.3.6",
+    "solidity-coverage": "^0.7.16",
     "web3": "^1.5.1"
   }
 }
