@@ -1,5 +1,6 @@
 require("@nomiclabs/hardhat-web3");
 require("@nomiclabs/hardhat-truffle5");
+require("solidity-coverage");
 require('dotenv').config()
 
 
@@ -20,6 +21,7 @@ module.exports = {
   // defaultNetwork: "hardhat",
   networks: {
     hardhat: {
+      hardfork: "istanbul"
     },
     // production: {
     //   url: getEnv('RPC_URL'),
@@ -32,7 +34,7 @@ module.exports = {
       optimizer: {
         enabled: true,
         runs: 200
-      }
-    }
+      },
+    },
   },
 };
