@@ -16,7 +16,7 @@ contract YayVesting is Ownable {
     using SafeERC20 for IERC20;
 
     // category
-    enum CategoryNames {EMPTY, SEED, STRATEGIC, PRESALE, PUBLIC}
+    enum CategoryNames {EMPTY, SEED, STRATEGIC, PRESALE, PUBLIC, V24MONTH}
     struct CategoryType {
         uint256 totalSteps;
         uint256 stepTime;       // unix format
@@ -73,19 +73,25 @@ contract YayVesting is Ownable {
             totalSteps: 12,
             stepTime: 30 days,
             percentBefore: 10_00,
-            percentAfter: 7_50  // 7.50% * 12 + 10.00% = 100.00%
+            percentAfter: 7_50  // 10.00% + 7.50% * 12 = 100.00%
         });
         categories[CategoryNames.PRESALE] = CategoryType({
             totalSteps: 5,
             stepTime: 30 days,
             percentBefore: 30_00,
-            percentAfter: 14_00  // 14.00% * 5 + 30.00% = 100.00%
+            percentAfter: 14_00  // 30.00% + 14.00% * 5 = 100.00%
         });
         categories[CategoryNames.PUBLIC] = CategoryType({
             totalSteps: 8,
             stepTime: 7 days,
             percentBefore: 30_00,
-            percentAfter: 8_75  // 8.75% * 8 + 30.00% = 100.00%
+            percentAfter: 8_75  // 30.00% + 8.75% * 8 = 100.00%
+        });
+        categories[CategoryNames.V24MONTH] = CategoryType({
+            totalSteps: 23,
+            stepTime: 30 days,
+            percentBefore: 4_17,
+            percentAfter: 4_17  // 4,17% * 22 + 4,17% + 4,09% = 100.00%
         });
     }
 

@@ -39,5 +39,11 @@ contract YayVestingMock is YayVesting {
             percentBefore: 30_00,
             percentAfter: 8_75
         });
+        categories[CategoryNames.V24MONTH] = CategoryType({
+            totalSteps: stepsTimePublic,
+            stepTime: 30 days,
+            percentBefore: 4_17,
+            percentAfter: 4_17
+        });
     }
 }
