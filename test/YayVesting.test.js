@@ -188,25 +188,6 @@ contract('YayVesting', function (accounts) {
             await this.token.transfer(this.yayVesting.address, this.totalTokens);
         });
 
-        it('emergency withdrawal', async function () {
-            const proof = this.merkleTree.getHexProof(this.elems[0]);
-            await advanceBlockAndSetTime(this.tgeTimestamp + DAY);
-
-            expect((await this.token.balanceOf.call(accounts[0])).toString()).to.equal("0");
-    
-            await expectRevert(
-                this.yayVesting.emergencyWithdrawal(this.totalTokens, {from: accounts[1]}),
-                "Ownable: caller is not the owner",
-            );
-            await expectRevert(
-                this.yayVesting.emergencyWithdrawal(new BN("0"), {from: accounts[0]}),
-                "YayVesting: amount must be greater than 0",
-            );
-
-            await this.yayVesting.emergencyWithdrawal(this.totalTokens, {from: accounts[0]});
-            expect((await this.token.balanceOf.call(accounts[0])).toString()).to.equal((this.totalTokens).toString());
-        });
-
         describe('verify', function () {
             it('positive proof', async function () {
                 const proof1 = this.merkleTree.getHexProof(this.elems[0]);

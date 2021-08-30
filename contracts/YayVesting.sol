@@ -6,10 +6,14 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+// solhint-disable not-rely-on-time
 
 contract YayVesting is Ownable {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
 
     // category
     enum CategoryNames {EMPTY, SEED, STRATEGIC, PRESALE, PUBLIC}
@@ -48,8 +52,7 @@ contract YayVesting is Ownable {
     );
     event TgeClaim(address indexed target, uint256 value, uint256 timestamp);
     event StepClaim(address indexed target, uint256 indexed step, uint256 value, uint256 timestamp);
-    
-    // solhint-disable not-rely-on-time
+
     constructor(address _token, bytes32 _mercleRoot, uint256 _tgeTimestamp) public {
         require(_token != address(0), "YayVesting: zero token address");
         require(_mercleRoot != bytes32(0), "YayVesting: zero mercle root");
@@ -84,12 +87,6 @@ contract YayVesting is Ownable {
             percentBefore: 30_00,
             percentAfter: 8_75  // 8.75% * 8 + 30.00% = 100.00%
         });
-    }
-
-    function emergencyWithdrawal(uint256 amount) external onlyOwner returns(bool) {
-        require(amount > 0, "YayVesting: amount must be greater than 0");
-        IERC20(token).transfer(msg.sender, amount);
-        return true;
     }
 
     function checkClaim(address _target, uint256 _category, uint256 _amount, bytes32[] calldata _merkleProof) external view returns(bool) {
@@ -141,7 +138,7 @@ contract YayVesting is Ownable {
         }
 
         alreadyRewarded[msg.sender] = alreadyRewarded[msg.sender].add(resultReward);
-        IERC20(token).transfer(msg.sender, resultReward);
+        IERC20(token).safeTransfer(msg.sender, resultReward);
 
         emit Claim(msg.sender, _category, _amount, _merkleProof, resultReward, block.timestamp);
 
