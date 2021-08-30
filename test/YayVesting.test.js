@@ -88,6 +88,7 @@ contract('YayVesting', function (accounts) {
             [accounts[3], 4, new BN('30000')],
             [accounts[4], 0, new BN('30000')],
             [accounts[5], 1, new BN('0')],
+            [accounts[6], 5, new BN('100000')],
         ];
         
         this.elems = [];
@@ -170,6 +171,9 @@ contract('YayVesting', function (accounts) {
             describe('public vesting', function () {
                 claimInAllCases(new BN("3000"), new BN("875"), 7*DAY, 3);
             });
+            describe('v24month vesting', function () {
+                claimInAllCases(new BN("417"), new BN("417"), 30*DAY, 6);
+            });
         });
     });
 
@@ -186,25 +190,6 @@ contract('YayVesting', function (accounts) {
             );
     
             await this.token.transfer(this.yayVesting.address, this.totalTokens);
-        });
-
-        it('emergency withdrawal', async function () {
-            const proof = this.merkleTree.getHexProof(this.elems[0]);
-            await advanceBlockAndSetTime(this.tgeTimestamp + DAY);
-
-            expect((await this.token.balanceOf.call(accounts[0])).toString()).to.equal("0");
-    
-            await expectRevert(
-                this.yayVesting.emergencyWithdrawal(this.totalTokens, {from: accounts[1]}),
-                "Ownable: caller is not the owner",
-            );
-            await expectRevert(
-                this.yayVesting.emergencyWithdrawal(new BN("0"), {from: accounts[0]}),
-                "YayVesting: amount must be greater than 0",
-            );
-
-            await this.yayVesting.emergencyWithdrawal(this.totalTokens, {from: accounts[0]});
-            expect((await this.token.balanceOf.call(accounts[0])).toString()).to.equal((this.totalTokens).toString());
         });
 
         describe('verify', function () {
@@ -284,6 +269,58 @@ contract('YayVesting', function (accounts) {
                     'YayVesting: no tokens to claim',
                 );
             });
+            describe('v24month specifics', function () {
+                it('after deadline', async function () {
+                    const proof = this.merkleTree.getHexProof(this.elems[6]);
+                    await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*23 + DAY);
+            
+                    let result = (await this.yayVesting.claim.call(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]})).toString();
+                    let expectedReward = (new BN("100000")).toString();
+                    await assert.equal(
+                        result,
+                        expectedReward
+                    );
+                    await this.yayVesting.claim(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]});
+                    expect((await this.token.balanceOf.call(accounts[6])).toString()).to.equal(expectedReward);
+            
+                    await expectRevert(
+                        this.yayVesting.claim(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]}),
+                        'YayVesting: no tokens to claim',
+                    );
+        
+                    await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*30 + DAY);
+                    await expectRevert(
+                        this.yayVesting.claim(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]}),
+                        'YayVesting: no tokens to claim',
+                    );
+                });
+                it('before deadline', async function () {
+                    const proof = this.merkleTree.getHexProof(this.elems[6]);
+                    await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*22 + DAY);
+            
+                    let result = (await this.yayVesting.claim.call(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]})).toString();
+                    let expectedReward = (new BN("95910")).toString();
+                    await assert.equal(
+                        result,
+                        expectedReward
+                    );
+                    await this.yayVesting.claim(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]});
+                    expect((await this.token.balanceOf.call(accounts[6])).toString()).to.equal(expectedReward);
+            
+                    await expectRevert(
+                        this.yayVesting.claim(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]}),
+                        'YayVesting: no tokens to claim',
+                    );
+        
+                    await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*23 + DAY);
+                    result = (await this.yayVesting.claim.call(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]})).toString();
+                    expectedReward = (new BN("4090")).toString();
+                    await assert.equal(
+                        result,
+                        expectedReward
+                    );
+                });
+            });
             describe('legasy tests', function () {
                 it('before TGE', async function () {
                     const proof = this.merkleTree.getHexProof(this.elems[0]);
@@ -329,5 +366,4 @@ contract('YayVesting', function (accounts) {
             });
         });
     });
-
 });

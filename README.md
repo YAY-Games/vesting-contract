@@ -49,6 +49,7 @@ category id:
 2 = STRATEGIC
 3 = PRESALE
 4 = PUBLIC
+5 = V24MONTH
 ```
 
 2. Generate mercle tree root

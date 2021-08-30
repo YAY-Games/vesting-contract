@@ -6,13 +6,17 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+// solhint-disable not-rely-on-time
 
 contract YayVesting is Ownable {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
 
     // category
-    enum CategoryNames {EMPTY, SEED, STRATEGIC, PRESALE, PUBLIC}
+    enum CategoryNames {EMPTY, SEED, STRATEGIC, PRESALE, PUBLIC, V24MONTH}
     struct CategoryType {
         uint256 totalSteps;
         uint256 stepTime;       // unix format
@@ -48,8 +52,7 @@ contract YayVesting is Ownable {
     );
     event TgeClaim(address indexed target, uint256 value, uint256 timestamp);
     event StepClaim(address indexed target, uint256 indexed step, uint256 value, uint256 timestamp);
-    
-    // solhint-disable not-rely-on-time
+
     constructor(address _token, bytes32 _mercleRoot, uint256 _tgeTimestamp) public {
         require(_token != address(0), "YayVesting: zero token address");
         require(_mercleRoot != bytes32(0), "YayVesting: zero mercle root");
@@ -70,26 +73,26 @@ contract YayVesting is Ownable {
             totalSteps: 12,
             stepTime: 30 days,
             percentBefore: 10_00,
-            percentAfter: 7_50  // 7.50% * 12 + 10.00% = 100.00%
+            percentAfter: 7_50  // 10.00% + 7.50% * 12 = 100.00%
         });
         categories[CategoryNames.PRESALE] = CategoryType({
             totalSteps: 5,
             stepTime: 30 days,
             percentBefore: 30_00,
-            percentAfter: 14_00  // 14.00% * 5 + 30.00% = 100.00%
+            percentAfter: 14_00  // 30.00% + 14.00% * 5 = 100.00%
         });
         categories[CategoryNames.PUBLIC] = CategoryType({
             totalSteps: 8,
             stepTime: 7 days,
             percentBefore: 30_00,
-            percentAfter: 8_75  // 8.75% * 8 + 30.00% = 100.00%
+            percentAfter: 8_75  // 30.00% + 8.75% * 8 = 100.00%
         });
-    }
-
-    function emergencyWithdrawal(uint256 amount) external onlyOwner returns(bool) {
-        require(amount > 0, "YayVesting: amount must be greater than 0");
-        IERC20(token).transfer(msg.sender, amount);
-        return true;
+        categories[CategoryNames.V24MONTH] = CategoryType({
+            totalSteps: 23,
+            stepTime: 30 days,
+            percentBefore: 4_17,
+            percentAfter: 4_17  // 4,17% * 22 + 4,17% + 4,09% = 100.00%
+        });
     }
 
     function checkClaim(address _target, uint256 _category, uint256 _amount, bytes32[] calldata _merkleProof) external view returns(bool) {
@@ -141,7 +144,7 @@ contract YayVesting is Ownable {
         }
 
         alreadyRewarded[msg.sender] = alreadyRewarded[msg.sender].add(resultReward);
-        IERC20(token).transfer(msg.sender, resultReward);
+        IERC20(token).safeTransfer(msg.sender, resultReward);
 
         emit Claim(msg.sender, _category, _amount, _merkleProof, resultReward, block.timestamp);
 
