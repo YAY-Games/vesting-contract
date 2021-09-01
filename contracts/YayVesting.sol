@@ -7,11 +7,10 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 
 // solhint-disable not-rely-on-time
 
-contract YayVesting is Ownable {
+contract YayVesting {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -67,7 +66,7 @@ contract YayVesting is Ownable {
             totalSteps: 15,
             stepTime: 30 days,
             percentBefore: 10_00,
-            percentAfter: 6_00  // 6.00% * 15 + 10.00% = 100.00%
+            percentAfter: 6_00  // 10.00% + 6.00% * 15 = 100.00%
         });
         categories[CategoryNames.STRATEGIC] = CategoryType({
             totalSteps: 12,
@@ -76,16 +75,16 @@ contract YayVesting is Ownable {
             percentAfter: 7_50  // 10.00% + 7.50% * 12 = 100.00%
         });
         categories[CategoryNames.PRESALE] = CategoryType({
-            totalSteps: 5,
+            totalSteps: 4,
             stepTime: 30 days,
-            percentBefore: 30_00,
-            percentAfter: 14_00  // 30.00% + 14.00% * 5 = 100.00%
+            percentBefore: 10_00,
+            percentAfter: 22_50  // 10.00% + 22.50% * 4 = 100.00%
         });
         categories[CategoryNames.PUBLIC] = CategoryType({
             totalSteps: 8,
             stepTime: 7 days,
-            percentBefore: 30_00,
-            percentAfter: 8_75  // 30.00% + 8.75% * 8 = 100.00%
+            percentBefore: 20_00,
+            percentAfter: 10_00  // 20.00% + 10.00% * 8 = 100.00%
         });
         categories[CategoryNames.V24MONTH] = CategoryType({
             totalSteps: 23,
