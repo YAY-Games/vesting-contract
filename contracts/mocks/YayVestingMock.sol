@@ -30,14 +30,14 @@ contract YayVestingMock is YayVesting {
         categories[CategoryNames.PRESALE] = CategoryType({
             totalSteps: stepsTimePresale,
             stepTime: 30 days,
-            percentBefore: 30_00,
-            percentAfter: 14_00
+            percentBefore: 10_00,
+            percentAfter: 22_50
         });
         categories[CategoryNames.PUBLIC] = CategoryType({
             totalSteps: stepsTimePublic,
             stepTime: 7 days,
-            percentBefore: 30_00,
-            percentAfter: 8_75
+            percentBefore: 20_00,
+            percentAfter: 10_00
         });
         categories[CategoryNames.V24MONTH] = CategoryType({
             totalSteps: stepsTimePublic,

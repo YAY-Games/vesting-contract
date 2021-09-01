@@ -166,10 +166,10 @@ contract('YayVesting', function (accounts) {
                 claimInAllCases(new BN("1000"), new BN("750"), 30*DAY, 1);
             });
             describe('presale vesting', function () {
-                claimInAllCases(new BN("3000"), new BN("1400"), 30*DAY, 2);
+                claimInAllCases(new BN("1000"), new BN("2250"), 30*DAY, 2);
             });
             describe('public vesting', function () {
-                claimInAllCases(new BN("3000"), new BN("875"), 7*DAY, 3);
+                claimInAllCases(new BN("2000"), new BN("1000"), 7*DAY, 3);
             });
             describe('v24month vesting', function () {
                 claimInAllCases(new BN("417"), new BN("417"), 30*DAY, 6);
