@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.12;
-pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
@@ -15,7 +14,7 @@ contract YayVesting {
     using SafeERC20 for IERC20;
 
     // category
-    enum CategoryNames {EMPTY, SEED, STRATEGIC, PRESALE, PUBLIC, V24MONTH}
+    enum CategoryNames {EMPTY, SEED, STRATEGIC, PRESALE, PUBLIC, V24MONTH, V20MONTH}
     struct CategoryType {
         uint256 totalSteps;
         uint256 stepTime;       // unix format
@@ -90,7 +89,13 @@ contract YayVesting {
             totalSteps: 23,
             stepTime: 30 days,
             percentBefore: 4_17,
-            percentAfter: 4_17  // 4,17% * 22 + 4,17% + 4,09% = 100.00%
+            percentAfter: 4_17  // 4,17% + 4,17% * 22 + 4,09% = 100.00%
+        });
+        categories[CategoryNames.V20MONTH] = CategoryType({
+            totalSteps: 20,
+            stepTime: 30 days,
+            percentBefore: 0,
+            percentAfter: 5_00  // 0,00% + 5,00% * 20 = 100.00%
         });
     }
 

@@ -89,6 +89,7 @@ contract('YayVesting', function (accounts) {
             [accounts[4], 0, new BN('30000')],
             [accounts[5], 1, new BN('0')],
             [accounts[6], 5, new BN('100000')],
+            [accounts[7], 6, new BN('100000')]
         ];
         
         this.elems = [];
@@ -174,6 +175,9 @@ contract('YayVesting', function (accounts) {
             describe('v24month vesting', function () {
                 claimInAllCases(new BN("417"), new BN("417"), 30*DAY, 6);
             });
+            // describe('v20month vesting', function () {
+            //     claimInAllCases(new BN("0"), new BN("500"), 30*DAY, 7);
+            // });
         });
     });
 
