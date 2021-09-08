@@ -51,6 +51,7 @@ category id:
 4 = PUBLIC
 5 = V24MONTH
 6 = V20MONTH
+7 = V4MONTH
 ```
 
 2. Generate mercle tree root

@@ -14,7 +14,7 @@ contract YayVesting {
     using SafeERC20 for IERC20;
 
     // category
-    enum CategoryNames {EMPTY, SEED, STRATEGIC, PRESALE, PUBLIC, V24MONTH, V20MONTH}
+    enum CategoryNames {EMPTY, SEED, STRATEGIC, PRESALE, PUBLIC, V24MONTH, V20MONTH, V4MONTH}
     struct CategoryType {
         uint256 totalSteps;
         uint256 stepTime;       // unix format
@@ -89,13 +89,19 @@ contract YayVesting {
             totalSteps: 23,
             stepTime: 30 days,
             percentBefore: 4_17,
-            percentAfter: 4_17  // 4,17% + 4,17% * 22 + 4,09% = 100.00%
+            percentAfter: 4_17  // 4.17% + 4.17% * 22 + 4.09% = 100.00%
         });
         categories[CategoryNames.V20MONTH] = CategoryType({
             totalSteps: 20,
             stepTime: 30 days,
             percentBefore: 0,
-            percentAfter: 5_00  // 0,00% + 5,00% * 20 = 100.00%
+            percentAfter: 5_00  // 0.00% + 5.00% * 20 = 100.00%
+        });
+        categories[CategoryNames.V4MONTH] = CategoryType({
+            totalSteps: 3,
+            stepTime: 30 days,
+            percentBefore: 25_00,
+            percentAfter: 25_00  // 25.00% + 25.00% * 3 = 100.00%
         });
     }
 

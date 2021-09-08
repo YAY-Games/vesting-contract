@@ -13,7 +13,7 @@ const YayVestingMock = artifacts.require('YayVestingMock');
 const YayVesting = artifacts.require('YayVesting');
 
 const DAY = 86400;
-const STEP_COUNT = 4;
+const STEP_COUNT = 3;
 
 contract('YayVesting', function (accounts) {
 
@@ -89,7 +89,8 @@ contract('YayVesting', function (accounts) {
             [accounts[4], 0, new BN('30000')],
             [accounts[5], 1, new BN('0')],
             [accounts[6], 5, new BN('100000')],
-            [accounts[7], 6, new BN('100000')]
+            [accounts[7], 6, new BN('100000')],
+            [accounts[8], 7, new BN('200000')]
         ];
         
         this.elems = [];
@@ -178,6 +179,9 @@ contract('YayVesting', function (accounts) {
             // describe('v20month vesting', function () {
             //     claimInAllCases(new BN("0"), new BN("500"), 30*DAY, 7);
             // });
+            describe('v4month vesting', function () {
+                claimInAllCases(new BN("2500"), new BN("2500"), 30*DAY, 8);
+            });
         });
     });
 
