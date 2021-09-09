@@ -64,44 +64,44 @@ contract YayVesting {
         categories[CategoryNames.SEED] = CategoryType({
             totalSteps: 15,
             stepTime: 30 days,
-            percentBefore: 10_00,
-            percentAfter: 6_00  // 10.00% + 6.00% * 15 = 100.00%
+            percentBefore: 0,
+            percentAfter: 6_00
         });
         categories[CategoryNames.STRATEGIC] = CategoryType({
             totalSteps: 12,
             stepTime: 30 days,
-            percentBefore: 10_00,
-            percentAfter: 7_50  // 10.00% + 7.50% * 12 = 100.00%
+            percentBefore: 0,
+            percentAfter: 7_50
         });
         categories[CategoryNames.PRESALE] = CategoryType({
-            totalSteps: 4,
+            totalSteps: 5,
             stepTime: 30 days,
-            percentBefore: 10_00,
-            percentAfter: 22_50  // 10.00% + 22.50% * 4 = 100.00%
+            percentBefore: 0,
+            percentAfter: 14_00
         });
         categories[CategoryNames.PUBLIC] = CategoryType({
             totalSteps: 8,
             stepTime: 7 days,
-            percentBefore: 20_00,
-            percentAfter: 10_00  // 20.00% + 10.00% * 8 = 100.00%
+            percentBefore: 0,
+            percentAfter: 8_75
         });
         categories[CategoryNames.V24MONTH] = CategoryType({
             totalSteps: 23,
             stepTime: 30 days,
-            percentBefore: 4_17,
-            percentAfter: 4_17  // 4.17% + 4.17% * 22 + 4.09% = 100.00%
+            percentBefore: 0,
+            percentAfter: 4_17
         });
         categories[CategoryNames.V20MONTH] = CategoryType({
             totalSteps: 20,
             stepTime: 30 days,
             percentBefore: 0,
-            percentAfter: 5_00  // 0.00% + 5.00% * 20 = 100.00%
+            percentAfter: 5_00
         });
         categories[CategoryNames.V4MONTH] = CategoryType({
             totalSteps: 3,
             stepTime: 30 days,
-            percentBefore: 25_00,
-            percentAfter: 25_00  // 25.00% + 25.00% * 3 = 100.00%
+            percentBefore: 0,
+            percentAfter: 25_00
         });
     }
 
