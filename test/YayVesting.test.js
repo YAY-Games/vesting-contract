@@ -1,5 +1,3 @@
-require('@openzeppelin/test-helpers');
-
 const { MerkleTree } = require('merkletreejs');
 const keccak256 = require('keccak256');
 
@@ -32,15 +30,14 @@ contract('YayVesting', function (accounts) {
     
         for (let i = 0; i < (STEP_COUNT + 1); i++) {
             // console.log("");
-            for (let j = 0; j < 2**i; j++) {
+            for (let j = 1; j < 2**i; j++) {
                 let a = [];
-                for (let k = 0; k < i; k++) {
+                for (let k = 1; k < i; k++) {
                     if ((j >> k) & 1) {
                         a.push(k);
                     }
                 }
                 a.push(i)
-                // console.log(a);
                 
                 let testMsg = i == 0 ? 'after tge' : `step ${i}, variant ${a}`
                 it(testMsg, async function () {
@@ -131,14 +128,6 @@ contract('YayVesting', function (accounts) {
             ),
             "YayVesting: zero mercle root",
         );
-        await expectRevert(
-            YayVesting.new(
-                this.token.address,
-                this.merkleRoot,
-                "0"
-            ),
-            "ayVesting: wrong TGE timestamp",
-        );
     });
 
     describe('mock contract', function () {
@@ -162,25 +151,25 @@ contract('YayVesting', function (accounts) {
 
         describe('vesting by categories', function () {
             describe('seed vesting', function () {
-                claimInAllCases(new BN("1000"), new BN("600"), 30*DAY, 0);
+                claimInAllCases(new BN("0"), new BN("600"), 30*DAY, 0);
             });
             describe('strategic vesting', function () {
-                claimInAllCases(new BN("1000"), new BN("750"), 30*DAY, 1);
+                claimInAllCases(new BN("0"), new BN("750"), 30*DAY, 1);
             });
             describe('presale vesting', function () {
-                claimInAllCases(new BN("1000"), new BN("2250"), 30*DAY, 2);
+                claimInAllCases(new BN("0"), new BN("2250"), 30*DAY, 2);
             });
             describe('public vesting', function () {
-                claimInAllCases(new BN("2000"), new BN("1000"), 7*DAY, 3);
+                claimInAllCases(new BN("0"), new BN("1000"), 7*DAY, 3);
             });
             describe('v24month vesting', function () {
-                claimInAllCases(new BN("417"), new BN("417"), 30*DAY, 6);
+                claimInAllCases(new BN("0"), new BN("417"), 30*DAY, 6);
             });
             // describe('v20month vesting', function () {
             //     claimInAllCases(new BN("0"), new BN("500"), 30*DAY, 7);
             // });
             describe('v4month vesting', function () {
-                claimInAllCases(new BN("2500"), new BN("2500"), 30*DAY, 8);
+                claimInAllCases(new BN("0"), new BN("2500"), 30*DAY, 8);
             });
         });
     });
@@ -258,7 +247,7 @@ contract('YayVesting', function (accounts) {
                 await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*15 + DAY);
         
                 let result = (await this.yayVesting.claim.call(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]})).toString();
-                let expectedReward = (new BN("10000")).toString();
+                let expectedReward = (new BN("9000")).toString();
                 await assert.equal(
                     result,
                     expectedReward
@@ -283,7 +272,7 @@ contract('YayVesting', function (accounts) {
                     await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*23 + DAY);
             
                     let result = (await this.yayVesting.claim.call(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]})).toString();
-                    let expectedReward = (new BN("100000")).toString();
+                    let expectedReward = (new BN("95910")).toString();
                     await assert.equal(
                         result,
                         expectedReward
@@ -307,7 +296,7 @@ contract('YayVesting', function (accounts) {
                     await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*22 + DAY);
             
                     let result = (await this.yayVesting.claim.call(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]})).toString();
-                    let expectedReward = (new BN("95910")).toString();
+                    let expectedReward = (new BN("91740")).toString();
                     await assert.equal(
                         result,
                         expectedReward
@@ -322,7 +311,7 @@ contract('YayVesting', function (accounts) {
         
                     await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*23 + DAY);
                     result = (await this.yayVesting.claim.call(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]})).toString();
-                    expectedReward = (new BN("4090")).toString();
+                    expectedReward = (new BN("4170")).toString();
                     await assert.equal(
                         result,
                         expectedReward
@@ -341,14 +330,6 @@ contract('YayVesting', function (accounts) {
                     const proof = this.merkleTree.getHexProof(this.elems[0]);
                     await advanceTimeAndBlock(5);
     
-                    let result = (await this.yayVesting.claim.call(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]})).toString();
-                    await assert.equal(
-                        result,
-                        new BN("1000")
-                    );
-                    await this.yayVesting.claim(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]});
-                    expect((await this.token.balanceOf.call(accounts[0])).toString()).to.equal("1000");
-    
                     await expectRevert(
                         this.yayVesting.claim(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]}),
                         'YayVesting: no tokens to claim',
@@ -361,10 +342,10 @@ contract('YayVesting', function (accounts) {
                     let result = (await this.yayVesting.claim.call(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]})).toString();
                     await assert.equal(
                         result,
-                        (new BN("1600")).toString()
+                        (new BN("600")).toString()
                     );
                     await this.yayVesting.claim(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]});
-                    expect((await this.token.balanceOf.call(accounts[0])).toString()).to.equal("1600");
+                    expect((await this.token.balanceOf.call(accounts[0])).toString()).to.equal("600");
     
                     await expectRevert(
                         this.yayVesting.claim(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]}),

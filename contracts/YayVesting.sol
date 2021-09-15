@@ -54,7 +54,6 @@ contract YayVesting {
     constructor(address _token, bytes32 _mercleRoot, uint256 _tgeTimestamp) public {
         require(_token != address(0), "YayVesting: zero token address");
         require(_mercleRoot != bytes32(0), "YayVesting: zero mercle root");
-        require(_tgeTimestamp >= block.timestamp, "YayVesting: wrong TGE timestamp");
 
         token = _token;
         mercleRoot = _mercleRoot;
