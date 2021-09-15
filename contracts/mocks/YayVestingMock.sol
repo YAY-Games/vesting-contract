@@ -18,31 +18,31 @@ contract YayVestingMock is YayVesting {
         categories[CategoryNames.SEED] = CategoryType({
             totalSteps: stepsTimeSeed,
             stepTime: 30 days,
-            percentBefore: 10_00,
+            percentBefore: 0,
             percentAfter: 6_00
         });
         categories[CategoryNames.STRATEGIC] = CategoryType({
             totalSteps: stepsTimeStrategic,
             stepTime: 30 days,
-            percentBefore: 10_00,
+            percentBefore: 0,
             percentAfter: 7_50
         });
         categories[CategoryNames.PRESALE] = CategoryType({
             totalSteps: stepsTimePresale,
             stepTime: 30 days,
-            percentBefore: 10_00,
+            percentBefore: 0,
             percentAfter: 22_50
         });
         categories[CategoryNames.PUBLIC] = CategoryType({
             totalSteps: stepsTimePublic,
             stepTime: 7 days,
-            percentBefore: 20_00,
+            percentBefore: 0,
             percentAfter: 10_00
         });
         categories[CategoryNames.V24MONTH] = CategoryType({
             totalSteps: stepsTimePublic,
             stepTime: 30 days,
-            percentBefore: 4_17,
+            percentBefore: 0,
             percentAfter: 4_17
         });
     }
