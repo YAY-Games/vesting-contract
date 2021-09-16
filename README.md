@@ -1,6 +1,7 @@
 # $YAY Vesting contract
 
 [![HardhatBuild](https://github.com/YAY-Games/vesting-contract/actions/workflows/testing.yaml/badge.svg)](https://github.com/YAY-Games/vesting-contract/actions/workflows/testing.yaml)
+[![codecov](https://codecov.io/gh/YAY-Games/vesting-contract/branch/master/graph/badge.svg?token=sdsAmkTzOF)](https://codecov.io/gh/YAY-Games/vesting-contract)
 
 - Language: Solidity v0.6.12
 
