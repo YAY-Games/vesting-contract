@@ -52,6 +52,7 @@ contract YayVesting {
     event StepClaim(address indexed target, uint256 indexed step, uint256 value, uint256 timestamp);
 
     constructor(address _token, bytes32 _mercleRoot, uint256 _tgeTimestamp) public {
+        require(_tgeTimestamp >= block.timestamp, "YayVesting: wrong timestamp");
         require(_token != address(0), "YayVesting: zero token address");
         require(_mercleRoot != bytes32(0), "YayVesting: zero mercle root");
 
