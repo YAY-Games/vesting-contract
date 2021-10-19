@@ -15,8 +15,8 @@ contract YayVestingMock is YayVesting {
         categories[CategoryNames.VESTING] = CategoryType({
             totalSteps: steps,
             stepTime: 30 days,
-            percentBefore: 2_50,
-            percentAfter: 2_50
+            percentBefore: 2_70,
+            percentAfter: 2_70
         });
     }
 }
