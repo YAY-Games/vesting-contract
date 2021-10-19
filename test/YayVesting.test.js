@@ -11,7 +11,7 @@ const YayVestingMock = artifacts.require('YayVestingMock');
 const YayVesting = artifacts.require('YayVesting');
 
 const DAY = 86400;
-const STEP_COUNT = 4;
+const STEP_COUNT = 3;
 
 contract('YayVesting', function (accounts) {
 
@@ -148,7 +148,7 @@ contract('YayVesting', function (accounts) {
 
         describe('vesting by categories', function () {
             describe('VESTING', function () {
-                claimInAllCases(new BN("250"), new BN("250"), 30*DAY, 0);
+                claimInAllCases(new BN("2500"), new BN("2500"), 30*DAY, 0);
             });
         });
     });
