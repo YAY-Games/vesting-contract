@@ -62,10 +62,10 @@ contract YayVesting {
 
         // rounds settings
         categories[CategoryNames.VESTING] = CategoryType({
-            totalSteps: 5,
+            totalSteps: 36,
             stepTime: 30 days,
-            percentBefore: 12_50,
-            percentAfter: 12_50
+            percentBefore: 2_50,
+            percentAfter: 2_50
         });
     }
 
