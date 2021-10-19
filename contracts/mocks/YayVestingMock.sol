@@ -12,7 +12,7 @@ contract YayVestingMock is YayVesting {
         uint256 _tgeTimestamp,
         uint256 steps
     ) public YayVesting(_token, _mercleRoot, _tgeTimestamp) {
-        categories[CategoryNames.TEAM] = CategoryType({
+        categories[CategoryNames.VESTING] = CategoryType({
             totalSteps: steps,
             stepTime: 30 days,
             percentBefore: 4_00,

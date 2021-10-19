@@ -14,7 +14,7 @@ contract YayVesting {
     using SafeERC20 for IERC20;
 
     // category
-    enum CategoryNames {EMPTY, TEAM}
+    enum CategoryNames {EMPTY, VESTING}
     struct CategoryType {
         uint256 totalSteps;
         uint256 stepTime;       // unix format
@@ -60,7 +60,7 @@ contract YayVesting {
         tgeTimestamp = _tgeTimestamp;
 
         // rounds settings
-        categories[CategoryNames.TEAM] = CategoryType({
+        categories[CategoryNames.VESTING] = CategoryType({
             totalSteps: 24,
             stepTime: 30 days,
             percentBefore: 4_00,
