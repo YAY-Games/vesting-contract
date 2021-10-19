@@ -48,13 +48,7 @@ npm run lint
 Tip:
 ```
 category id:
-1 = SEED
-2 = STRATEGIC
-3 = PRESALE
-4 = PUBLIC
-5 = V24MONTH
-6 = V20MONTH
-7 = V4MONTH
+1 = VESTING
 ```
 
 2. Generate mercle tree root
