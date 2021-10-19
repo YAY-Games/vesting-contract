@@ -148,7 +148,7 @@ contract('YayVesting', function (accounts) {
 
         describe('vesting by categories', function () {
             describe('VESTING', function () {
-                claimInAllCases(new BN("400"), new BN("400"), 30*DAY, 0);
+                claimInAllCases(new BN("1250"), new BN("1250"), 30*DAY, 0);
             });
         });
     });
