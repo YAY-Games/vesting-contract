@@ -14,7 +14,7 @@ contract YayVesting {
     using SafeERC20 for IERC20;
 
     // category
-    enum CategoryNames {EMPTY, SEED, STRATEGIC, PRESALE, PUBLIC, V24MONTH, V20MONTH, V4MONTH}
+    enum CategoryNames {EMPTY, TEAM}
     struct CategoryType {
         uint256 totalSteps;
         uint256 stepTime;       // unix format
@@ -60,47 +60,11 @@ contract YayVesting {
         tgeTimestamp = _tgeTimestamp;
 
         // rounds settings
-        categories[CategoryNames.SEED] = CategoryType({
-            totalSteps: 15,
+        categories[CategoryNames.TEAM] = CategoryType({
+            totalSteps: 24,
             stepTime: 30 days,
-            percentBefore: 0,
-            percentAfter: 6_00
-        });
-        categories[CategoryNames.STRATEGIC] = CategoryType({
-            totalSteps: 12,
-            stepTime: 30 days,
-            percentBefore: 0,
-            percentAfter: 7_50
-        });
-        categories[CategoryNames.PRESALE] = CategoryType({
-            totalSteps: 5,
-            stepTime: 30 days,
-            percentBefore: 0,
-            percentAfter: 14_00
-        });
-        categories[CategoryNames.PUBLIC] = CategoryType({
-            totalSteps: 8,
-            stepTime: 7 days,
-            percentBefore: 0,
-            percentAfter: 8_75
-        });
-        categories[CategoryNames.V24MONTH] = CategoryType({
-            totalSteps: 23,
-            stepTime: 30 days,
-            percentBefore: 0,
-            percentAfter: 4_17
-        });
-        categories[CategoryNames.V20MONTH] = CategoryType({
-            totalSteps: 20,
-            stepTime: 30 days,
-            percentBefore: 0,
-            percentAfter: 5_00
-        });
-        categories[CategoryNames.V4MONTH] = CategoryType({
-            totalSteps: 3,
-            stepTime: 30 days,
-            percentBefore: 0,
-            percentAfter: 25_00
+            percentBefore: 4_00,
+            percentAfter: 4_00
         });
     }
 

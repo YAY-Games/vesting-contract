@@ -11,7 +11,7 @@ const YayVestingMock = artifacts.require('YayVestingMock');
 const YayVesting = artifacts.require('YayVesting');
 
 const DAY = 86400;
-const STEP_COUNT = 3;
+const STEP_COUNT = 4;
 
 contract('YayVesting', function (accounts) {
 
@@ -140,36 +140,15 @@ contract('YayVesting', function (accounts) {
                 this.token.address,
                 this.merkleRoot,
                 this.tgeTimestamp,
-                STEP_COUNT,
-                STEP_COUNT,
-                STEP_COUNT,
-                STEP_COUNT,
+                STEP_COUNT
             );
     
             await this.token.transfer(this.yayVesting.address, this.totalTokens);
         });
 
         describe('vesting by categories', function () {
-            describe('seed vesting', function () {
-                claimInAllCases(new BN("0"), new BN("600"), 30*DAY, 0);
-            });
-            describe('strategic vesting', function () {
-                claimInAllCases(new BN("0"), new BN("750"), 30*DAY, 1);
-            });
-            describe('presale vesting', function () {
-                claimInAllCases(new BN("0"), new BN("2250"), 30*DAY, 2);
-            });
-            describe('public vesting', function () {
-                claimInAllCases(new BN("0"), new BN("1000"), 7*DAY, 3);
-            });
-            describe('v24month vesting', function () {
-                claimInAllCases(new BN("0"), new BN("417"), 30*DAY, 6);
-            });
-            // describe('v20month vesting', function () {
-            //     claimInAllCases(new BN("0"), new BN("500"), 30*DAY, 7);
-            // });
-            describe('v4month vesting', function () {
-                claimInAllCases(new BN("0"), new BN("2500"), 30*DAY, 8);
+            describe('TEAM', function () {
+                claimInAllCases(new BN("400"), new BN("400"), 30*DAY, 0);
             });
         });
     });
@@ -218,141 +197,5 @@ contract('YayVesting', function (accounts) {
             });
         });
 
-        describe('claim', function () {
-            it('negative cases', async function () {
-                const proof1 = this.merkleTree.getHexProof(this.elems[0]);
-                await expectRevert(
-                    this.yayVesting.claim(this.balances[1][1], this.balances[1][2], proof1, {from: accounts[0]}),
-                    'YayVesting: Invalid proof or wrong data',
-                );
-                await expectRevert(
-                    this.yayVesting.claim(this.balances[0][1], this.balances[0][2], proof1, {from: accounts[1]}),
-                    'YayVesting: Invalid proof or wrong data',
-                );
-
-                const proof2 = this.merkleTree.getHexProof(this.elems[4]);
-                await expectRevert(
-                    this.yayVesting.claim(this.balances[4][1], this.balances[4][2], proof2, {from: accounts[4]}),
-                    'YayVesting: Invalid category',
-                );
-
-                const proof3 = this.merkleTree.getHexProof(this.elems[5]);
-                await expectRevert(
-                    this.yayVesting.claim(this.balances[5][1], this.balances[5][2], proof3, {from: accounts[5]}),
-                    'YayVesting: Invalid amount',
-                );
-            });
-            it('after deadline', async function () {
-                const proof = this.merkleTree.getHexProof(this.elems[0]);
-                await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*15 + DAY);
-        
-                let result = (await this.yayVesting.claim.call(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]})).toString();
-                let expectedReward = (new BN("9000")).toString();
-                await assert.equal(
-                    result,
-                    expectedReward
-                );
-                await this.yayVesting.claim(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]});
-                expect((await this.token.balanceOf.call(accounts[0])).toString()).to.equal(expectedReward);
-        
-                await expectRevert(
-                    this.yayVesting.claim(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]}),
-                    'YayVesting: no tokens to claim',
-                );
-    
-                await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*30 + DAY);
-                await expectRevert(
-                    this.yayVesting.claim(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]}),
-                    'YayVesting: no tokens to claim',
-                );
-            });
-            describe('v24month specifics', function () {
-                it('after deadline', async function () {
-                    const proof = this.merkleTree.getHexProof(this.elems[6]);
-                    await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*23 + DAY);
-            
-                    let result = (await this.yayVesting.claim.call(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]})).toString();
-                    let expectedReward = (new BN("95910")).toString();
-                    await assert.equal(
-                        result,
-                        expectedReward
-                    );
-                    await this.yayVesting.claim(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]});
-                    expect((await this.token.balanceOf.call(accounts[6])).toString()).to.equal(expectedReward);
-            
-                    await expectRevert(
-                        this.yayVesting.claim(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]}),
-                        'YayVesting: no tokens to claim',
-                    );
-        
-                    await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*30 + DAY);
-                    await expectRevert(
-                        this.yayVesting.claim(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]}),
-                        'YayVesting: no tokens to claim',
-                    );
-                });
-                it('before deadline', async function () {
-                    const proof = this.merkleTree.getHexProof(this.elems[6]);
-                    await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*22 + DAY);
-            
-                    let result = (await this.yayVesting.claim.call(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]})).toString();
-                    let expectedReward = (new BN("91740")).toString();
-                    await assert.equal(
-                        result,
-                        expectedReward
-                    );
-                    await this.yayVesting.claim(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]});
-                    expect((await this.token.balanceOf.call(accounts[6])).toString()).to.equal(expectedReward);
-            
-                    await expectRevert(
-                        this.yayVesting.claim(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]}),
-                        'YayVesting: no tokens to claim',
-                    );
-        
-                    await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY*23 + DAY);
-                    result = (await this.yayVesting.claim.call(this.balances[6][1], this.balances[6][2], proof, {from: accounts[6]})).toString();
-                    expectedReward = (new BN("4170")).toString();
-                    await assert.equal(
-                        result,
-                        expectedReward
-                    );
-                });
-            });
-            describe('legasy tests', function () {
-                it('before TGE', async function () {
-                    const proof = this.merkleTree.getHexProof(this.elems[0]);
-                    await expectRevert(
-                        this.yayVesting.claim(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]}),
-                        'YayVesting: TGE has not started yet',
-                    );
-                });
-                it('immediately after TGE', async function () {
-                    const proof = this.merkleTree.getHexProof(this.elems[0]);
-                    await advanceTimeAndBlock(5);
-    
-                    await expectRevert(
-                        this.yayVesting.claim(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]}),
-                        'YayVesting: no tokens to claim',
-                    );
-                });
-                it('step 1', async function () {
-                    const proof = this.merkleTree.getHexProof(this.elems[0]);
-                    await advanceBlockAndSetTime(this.tgeTimestamp + 30*DAY);
-    
-                    let result = (await this.yayVesting.claim.call(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]})).toString();
-                    await assert.equal(
-                        result,
-                        (new BN("600")).toString()
-                    );
-                    await this.yayVesting.claim(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]});
-                    expect((await this.token.balanceOf.call(accounts[0])).toString()).to.equal("600");
-    
-                    await expectRevert(
-                        this.yayVesting.claim(this.balances[0][1], this.balances[0][2], proof, {from: accounts[0]}),
-                        'YayVesting: no tokens to claim',
-                    );
-                });
-            });
-        });
     });
 });
