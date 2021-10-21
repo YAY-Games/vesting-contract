@@ -1,29 +1,9 @@
 {
     "nodes": [
         {
-            "address": "0x15f71dbf318e54ce000d965422cbfdffc03c3cb0",
+            "address": "0xC984Fe6d540Da8D46C874D058244d0059CCd4E9b",
             "category": 1,
-            "amount": 100
-        },
-        {
-            "address": "0x15f71dbf318e54ce000d965422cbfdffc03c3cb1",
-            "category": 1,
-            "amount": 100
-        },
-        {
-            "address": "0x15f71dbf318e54ce000d965422cbfdffc03c3cb2",
-            "category": 1,
-            "amount": 100
-        },
-        {
-            "address": "0x15f71dbf318e54ce000d965422cbfdffc03c3cb3",
-            "category": 1,
-            "amount": 100
-        },
-        {
-            "address": "0x15f71dbf318e54ce000d965422cbfdffc03c3cb4",
-            "category": 1,
-            "amount": 100
+            "amount": "171125000000000000000000000"
         }
     ]
 }
